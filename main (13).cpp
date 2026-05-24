@@ -1,0 +1,203 @@
+#include <iostream>
+#include <array>
+#include <vector>
+#include <deque>
+#include <string>
+
+class Product {
+private:
+    std::string name;
+    int price;
+
+public:
+    Product() {
+        name = "";
+        price = 0;
+    }
+
+    Product(std::string n, int p) {
+        name = n;
+        price = p;
+    }
+
+    bool operator<(const Product& other) const {
+        return price < other.price;
+    }
+
+    bool operator==(const Product& other) const {
+        return name == other.name && price == other.price;
+    }
+
+    bool operator!=(const Product& other) const {
+        return !(*this == other);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Product& p) {
+        os << p.name << "(" << p.price << ")";
+        return os;
+    }
+};
+
+template <typename Container>
+void printContainer(const Container& container) {
+    for (auto it = container.begin(); it != container.end(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+}
+template <typename T, size_t N1, size_t N2>
+std::array<T, N1 + N2> mergeArrays(const std::array<T, N1>& first,
+                                   const std::array<T, N2>& second) {
+    std::array<T, N1 + N2> result{};
+
+    auto it1 = first.begin();
+    auto it2 = second.begin();
+    auto itResult = result.begin();
+
+    while (it1 != first.end() && it2 != second.end()) {
+        if (*it1 < *it2) {
+            *itResult = *it1;
+            ++it1;
+        } else {
+            *itResult = *it2;
+            ++it2;
+        }
+
+        ++itResult;
+    }
+
+    while (it1 != first.end()) {
+        *itResult = *it1;
+        ++it1;
+        ++itResult;
+    }
+
+    while (it2 != second.end()) {
+        *itResult = *it2;
+        ++it2;
+        ++itResult;
+    }
+
+    return result;
+}
+
+template <typename T>
+void splitEvenOdd(const std::vector<T>& source,
+                  std::vector<T>& even,
+                  std::vector<T>& odd) {
+    for (auto it = source.begin(); it != source.end(); ++it) {
+        if (*it % 2 == 0) {
+            even.push_back(*it);
+        } else {
+            odd.push_back(*it);
+        }
+    }
+}
+template <typename T>
+bool isPalindrome(const std::deque<T>& deq) {
+    if (deq.empty()) {
+        return true;
+    }
+
+    auto left = deq.begin();
+    auto right = deq.end();
+    --right;
+
+    while (left < right) {
+        if (*left != *right) {
+            return false;
+        }
+
+        ++left;
+        --right;
+    }
+
+    return true;
+}
+
+int main() {
+    std::cout << "Task 1. Merge std::array" << std::endl;
+
+    std::array<int, 4> arr1 = {1, 3, 5, 7};
+    std::array<int, 4> arr2 = {2, 4, 6, 8};
+
+    auto mergedInt = mergeArrays(arr1, arr2);
+
+    std::cout << "First array: ";
+    printContainer(arr1);
+
+    std::cout << "Second array: ";
+    printContainer(arr2);
+
+    std::cout << "Merged array: ";
+    printContainer(mergedInt);
+
+    std::array<Product, 3> products1 = {
+        Product("Garage", 50),
+        Product("Room", 100),
+        Product("Flat", 300)
+    };
+
+    std::array<Product, 3> products2 = {
+        Product("Studio", 200),
+        Product("House", 700),
+        Product("Villa", 900)
+    };
+
+    auto mergedProducts = mergeArrays(products1, products2);
+
+    std::cout << "Merged Product array: ";
+    printContainer(mergedProducts);
+
+
+    std::cout << std::endl;
+    std::cout << "Task 2. Split std::vector" << std::endl;
+
+    std::vector<int> numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    std::vector<int> evenNumbers;
+    std::vector<int> oddNumbers;
+
+    splitEvenOdd(numbers, evenNumbers, oddNumbers);
+
+    std::cout << "Original vector: ";
+    printContainer(numbers);
+
+    std::cout << "Even numbers: ";
+    printContainer(evenNumbers);
+
+    std::cout << "Odd numbers: ";
+    printContainer(oddNumbers);
+
+
+    std::cout << std::endl;
+    std::cout << "Task 3. Check std::deque palindrome" << std::endl;
+
+    std::deque<int> dequeInt = {1, 2, 3, 2, 1};
+    std::deque<char> dequeChar = {'a', 'b', 'b', 'a'};
+    std::deque<Product> dequeProduct = {
+        Product("Room", 100),
+        Product("Flat", 300),
+        Product("Room", 100)
+    };
+    
+    std::cout << "Deque int: ";
+    printContainer(dequeInt);
+
+    std::cout << "Is palindrome: ";
+    std::cout << (isPalindrome(dequeInt) ? "Yes" : "No") << std::endl;
+
+    std::cout << "Deque char: ";
+    printContainer(dequeChar);
+
+    std::cout << "Is palindrome: ";
+    std::cout << (isPalindrome(dequeChar) ? "Yes" : "No") << std::endl;
+
+    std::cout << "Deque Product: ";
+    printContainer(dequeProduct);
+
+    std::cout << "Is palindrome: ";
+    std::cout << (isPalindrome(dequeProduct) ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
